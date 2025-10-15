@@ -1,0 +1,24 @@
+# 1. Empezamos con una imagen oficial de Python
+FROM python:3.11-slim
+
+# 2. Le decimos a Debian (el Linux base) que no haga preguntas interactivas
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 3. ACTUALIZAMOS LA LISTA DE PAQUETES E INSTALAMOS GIT (¡LA LÍNEA CLAVE!)
+RUN apt-get update && apt-get install -y git
+
+# 4. Establecemos el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# 5. Copiamos solo el archivo de requerimientos primero
+COPY requirements.txt .
+
+# 6. Instalamos las librerías de Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 7. Copiamos el resto de los archivos de nuestra aplicación
+COPY . .
+
+# 8. Le decimos al contenedor qué comando ejecutar para arrancar la app
+# Escuchará en el puerto 80, que es el estándar para web
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:80"]
